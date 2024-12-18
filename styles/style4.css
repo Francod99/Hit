@@ -1,0 +1,349 @@
+ /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Verdana', sans-serif;
+            background: #f4f4f4 url('imagenes/pattern.png') repeat; /* Fondo con patrón Pokémon */
+            color: #333;
+            position: relative;
+        }
+
+        /* Opcional: imágenes decorativas en el fondo */
+        body::before {
+            content: "";
+            background: url('imagenes/pikachu-sil.png') no-repeat center center;
+            background-size: 300px 300px;
+            opacity: 0.1; /* semi-transparente */
+            position: absolute;
+            top: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            z-index: -1;
+        }
+
+        /* Header Styles (ahora no es sticky, así se desplaza con la página) */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to right, #ff0000, #3b4cca);
+            color: white;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #f9d71c;
+        }
+
+        /* Carrito */
+        .cart-container {
+            position: relative;
+        }
+
+        .cart {
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease;
+            background: none;
+            border: none;
+        }
+
+        .cart:hover {
+            transform: scale(1.1);
+        }
+
+        .cart img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: #ff0000;
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 0.8rem;
+        }
+
+        /* Fondo semi-transparente al abrir el popup */
+        .cart-overlay {
+            position: fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background: rgba(0,0,0,0.4);
+            display:none;
+            z-index: 999;
+        }
+
+        .cart-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 320px;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            display: none;
+            z-index: 1000;
+            transform: translate(-50%, -50%);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translate(-50%, -45%);}
+            to {opacity: 1; transform: translate(-50%, -50%);}
+        }
+
+        .cart-popup h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .cart-items {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 8px 0;
+        }
+
+        .cart-item p {
+            margin:0;
+            font-size: 0.9rem;
+        }
+
+        .cart-item button {
+            background: #ff0000;
+            color:white;
+            border:none;
+            padding:5px 8px;
+            border-radius:5px;
+            cursor:pointer;
+            font-size:0.8rem;
+        }
+
+        .cart-item button:hover {
+            background:#c00;
+        }
+
+        .cart-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-buttons button {
+            background: #3b4cca;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .cart-buttons button:hover {
+            background: #2a2c89;
+        }
+
+        .close-cart-btn {
+            background:none;
+            border:none;
+            color:#333;
+            font-size:1.2rem;
+            position:absolute;
+            top:10px;
+            right:10px;
+            cursor:pointer;
+        }
+
+        .close-cart-btn:hover {
+            color:#ff0000;
+        }
+
+        /* Layout principal */
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+            padding: 0 15px;
+        }
+
+        aside.filters {
+            background: #3b4cca;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            height: fit-content;
+        }
+
+        .filters h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .filters label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .filters input,
+        .filters select,
+        .filters button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .filters input,
+        .filters select {
+            background: #fff;
+            color: #333;
+        }
+
+        .filters button {
+            background: #ff5733;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .filters button:hover {
+            background: #c2342a;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .card h3 {
+            margin: 10px 0;
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            margin: 5px 0;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .card button {
+            background: #3b4cca;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .card button:hover {
+            background: #2a2c89;
+        }
+
+        /* Paginación */
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            padding: 10px 20px;
+            border: none;
+            background: #3b4cca;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .pagination button:hover:not([disabled]) {
+            background: #2a2c89;
+        }
+
+        .pagination button[disabled] {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(to right, #3b4cca, #ff0000);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 1rem;
+            margin-top: 40px;
+        }

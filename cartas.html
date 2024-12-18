@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pokémon Card Center</title>
+    <link rel="stylesheet" href="styles/styles3.css">
+</head>
+<body>
+    <div class="cart-overlay" id="cart-overlay"></div>
+    <header>
+        <div class="logo">
+            <img src="imagenes/logo.png" alt="Logo de Pokémon">
+            <h1>Hit N' Collect</h1>
+        </div>
+        <nav aria-label="Menú principal">
+            <a href="index.html">Inicio</a>
+            <a href="boosters.html">Boosters</a>
+        </nav>
+        <div class="cart-container">
+            <button class="cart" id="cart-icon" aria-label="Ver Carrito">
+                <img src="imagenes/images-Photoroom.png" alt="Carrito de compras">
+                <span class="cart-count" id="cart-count">0</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="cart-popup" id="cart-popup" role="dialog" aria-modal="true" aria-label="Carrito de Compras">
+        <div class="cart-header">
+            <h3>Tu Carrito</h3>
+            <button id="close-cart" class="close-cart" aria-label="Cerrar Carrito">✖</button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <p class="empty-cart">No hay productos en el carrito</p>
+        </div>
+        <div class="cart-footer">
+            <p><strong>Total:</strong> $<span id="total-price">0.00</span></p>
+            <div class="cart-buttons">
+                <button id="clear-cart" class="cart-action" aria-label="Vaciar Carrito">Vaciar</button>
+                <button id="checkout" class="cart-action" aria-label="Comprar">Comprar</button>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <aside class="filters" aria-label="Filtros de Productos">
+            <h2>Busca tu carta</h2>
+            <form id="filter-form">
+                <label for="type-filter">Tipo de Carta:</label>
+                <select id="type-filter">
+                    <option value="">Seleccionar Tipo</option>
+                    <option value="Water">💧 Agua</option>
+                    <option value="Fire">🔥 Fuego</option>
+                    <option value="Rock">🪨 Roca</option>
+                    <option value="Electric">⚡ Rayo</option>
+                    <option value="Dark">🌑 Siniestro</option>
+                    <option value="Poison">☠️ Veneno</option>
+                    <option value="Fairy">✨ Hada</option>
+                    <option value="Bug">🐞 Bicho</option>
+                    <option value="Dragon">🐉 Dragón</option>
+                    <option value="Fighting">🥊 Lucha</option>
+                    <option value="Flying">🌬️ Volador</option>
+                    <option value="Ghost">👻 Fantasma</option>
+                    <option value="Grass">🌱 Planta</option>
+                    <option value="Ground">⛰️ Tierra</option>
+                    <option value="Ice">❄️ Hielo</option>
+                    <option value="Normal">🔵 Normal</option>
+                    <option value="Psychic">🔮 Psíquico</option>
+                    <option value="Steel">⚙️ Acero</option>
+                    <option value="Trainer">🎓 Entrenador</option>
+                </select>
+
+                <label for="set-filter">Set:</label>
+                <select id="set-filter">
+                    <option value="">Seleccionar Set</option>
+                    <option value="Scarlet & Violet: Base">Scarlet & Violet: Base</option>
+                    <option value="Sword and Shield">Sword and Shield</option>
+                    <option value="Silver Tempest">Silver Tempest</option>
+                    <option value="Lost Origin">Lost Origin</option>
+                    <option value="Pokemon GO">Pokemon GO</option>
+                    <option value="Astral Radiance">Astral Radiance</option>
+                </select>
+
+                <button type="button" id="filter-btn">Aplicar Filtro</button>
+                <button type="button" id="reset-btn">Resetear Filtros</button>
+            </form>
+        </aside>
+
+        <section class="cards-section">
+            <div class="cards" id="cards-container"></div>
+            <div class="pagination" id="pagination-container">
+                <button id="prev-page" disabled>&laquo; Anterior</button>
+                <span id="page-indicator">Página 1</span>
+                <button id="next-page">&raquo; Siguiente</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>¡Atrápalos todos! 🎴</p>
+        <p>Hit N' Collect - Todos los derechos reservados</p>
+    </footer>
+
+    <script>
+        const rarities = ["comun","raro","ultra-raro"];
+        const types = [
+            "Water", "Fire", "Rock", "Electric", "Dark", "Poison", "Fairy", "Bug", "Dragon",
+            "Fighting", "Flying", "Ghost", "Grass", "Ground", "Ice", "Normal", "Psychic",
+            "Steel", "Trainer"
+        ];
+        const sets = [
+            "Scarlet & Violet: Base", "Sword and Shield", "Silver Tempest", "Lost Origin",
+            "Pokemon GO", "Astral Radiance"
+        ];
+
+        // Ahora cada producto tendrá una rareza aleatoria
+        const products = Array.from({ length: 102 }, (_, i) => ({
+            id: i + 1,
+            name: `Carta Pokémon ${i + 1}`,
+            price: Math.floor(Math.random() * 100) + 10,
+            type: types[Math.floor(Math.random() * types.length)],
+            set: sets[Math.floor(Math.random() * sets.length)],
+            rarity: rarities[Math.floor(Math.random() * rarities.length)],
+            image: `https://via.placeholder.com/300x200?text=Carta+${i + 1}`
+        }));
+
+        let filteredProducts = [...products];
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        let currentPage = 1;
+        const itemsPerPage = 12;
+
+        function addToCart(productId) {
+            const product = products.find((p) => p.id === productId);
+            if (!product) return;
+
+            if (cart.some((item) => item.id === productId)) {
+                alert("El producto ya está en el carrito.");
+                return;
+            }
+
+            cart.push(product);
+            updateCartUI();
+            localStorage.setItem("cart", JSON.stringify(cart));
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+            localStorage.setItem("cart", JSON.stringify(cart));
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+            localStorage.setItem("cart", JSON.stringify(cart));
+        }
+
+        function updateCartUI() {
+            const cartCountElement = document.getElementById("cart-count");
+            const cartItemsContainer = document.getElementById("cart-items");
+            const totalPriceElement = document.getElementById("total-price");
+
+            cartCountElement.textContent = cart.length;
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `<p class="empty-cart">No hay productos en el carrito</p>`;
+            } else {
+                cartItemsContainer.innerHTML = cart.map((item, index) => `
+                    <div class="cart-item">
+                        <p>${item.name} - $${item.price.toFixed(2)}</p>
+                        <button class="remove-item" onclick="removeFromCart(${index})">Eliminar</button>
+                    </div>
+                `).join("");
+            }
+
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            totalPriceElement.textContent = total.toFixed(2);
+        }
+
+        function redirectToPayment() {
+            if (cart.length === 0) {
+                alert("El carrito está vacío.");
+                return;
+            }
+            localStorage.setItem("cart", JSON.stringify(cart));
+            window.location.href = "payment.html";
+        }
+
+        function renderPage(page) {
+            const container = document.getElementById("cards-container");
+            container.innerHTML = "";
+            const start = (page - 1) * itemsPerPage;
+            const end = page * itemsPerPage;
+
+            filteredProducts.slice(start, end).forEach((product) => {
+                let rarityClass = "";
+                if (product.rarity === "raro") {
+                    rarityClass = "rare-product";
+                } else if (product.rarity === "ultra-raro") {
+                    rarityClass = "ultra-rare-product";
+                }
+
+                const card = `
+                    <div class="card ${rarityClass}">
+                        <img src="${product.image}" alt="Imagen de ${product.name}">
+                        <h3>${product.name}</h3>
+                        <p>Tipo: ${product.type}</p>
+                        <p>Set: ${product.set}</p>
+                        <p>Rareza: ${product.rarity.replace('-', ' ')}</p>
+                        <p>$${product.price}</p>
+                        <button onclick="addToCart(${product.id})">Agregar al carrito</button>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+
+            const prevButton = document.getElementById("prev-page");
+            const nextButton = document.getElementById("next-page");
+            const pageIndicator = document.getElementById("page-indicator");
+
+            prevButton.disabled = page === 1;
+            nextButton.disabled = page === Math.ceil(filteredProducts.length / itemsPerPage);
+            pageIndicator.textContent = `Página ${page}`;
+        }
+
+        function applyFilters() {
+            const typeFilter = document.getElementById("type-filter").value;
+            const setFilter = document.getElementById("set-filter").value;
+
+            filteredProducts = products.filter(
+                (product) =>
+                    (!typeFilter || product.type === typeFilter) &&
+                    (!setFilter || product.set === setFilter)
+            );
+
+            currentPage = 1;
+            renderPage(currentPage);
+        }
+
+        function resetFilters() {
+            filteredProducts = [...products];
+            document.getElementById("type-filter").value = "";
+            document.getElementById("set-filter").value = "";
+            currentPage = 1;
+            renderPage(currentPage);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderPage(currentPage);
+            updateCartUI();
+
+            document.getElementById("filter-btn").addEventListener("click", applyFilters);
+            document.getElementById("reset-btn").addEventListener("click", resetFilters);
+
+            document.getElementById("prev-page").addEventListener("click", () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderPage(currentPage);
+                }
+            });
+
+            document.getElementById("next-page").addEventListener("click", () => {
+                if (currentPage < Math.ceil(filteredProducts.length / itemsPerPage)) {
+                    currentPage++;
+                    renderPage(currentPage);
+                }
+            });
+
+            document.getElementById("clear-cart").addEventListener("click", clearCart);
+            document.getElementById("checkout").addEventListener("click", redirectToPayment);
+
+            const cartIcon = document.getElementById("cart-icon");
+            const cartPopup = document.getElementById("cart-popup");
+            const closeCart = document.getElementById("close-cart");
+            const cartOverlay = document.getElementById("cart-overlay");
+
+            cartIcon.addEventListener("click", () => {
+                cartPopup.classList.toggle("active");
+                cartOverlay.style.display = cartPopup.classList.contains("active") ? "block" : "none";
+            });
+
+            closeCart.addEventListener("click", closeCartPopup);
+            cartOverlay.addEventListener("click", closeCartPopup);
+
+            function closeCartPopup() {
+                cartPopup.classList.remove("active");
+                cartOverlay.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>
